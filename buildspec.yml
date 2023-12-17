@@ -1,15 +1,20 @@
 version: 0.2
 
 phases:
-  install:
-    runtime-versions:
-      java: corretto11
   pre_build:
     commands:
-      - ./mvnw clean install
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
   build:
     commands:
-      - ./mvnw package
+      - echo Building the Docker image...
+      - docker build -t $REPOSITORY_URI:latest .
+      - docker tag 367640547156.dkr.ecr.ap-southeast-1.amazonaws.com/edubridge:latest 367640547156.dkr.ecr.ap-southeast-1.amazonaws.com/edubridge:$CODEBUILD_RESOLVED_SOURCE_VERSION
+  post_build:
+    commands:
+      - echo Pushing the Docker image to Amazon ECR...
+      - docker push 367640547156.dkr.ecr.ap-southeast-1.amazonaws.com/edubridge:latest
+      - docker push 367640547156.dkr.ecr.ap-southeast-1.amazonaws.com/edubridge:$CODEBUILD_RESOLVED_SOURCE_VERSION
 artifacts:
-  files: target/*.jar
-  discard-paths: yes
+  files: imagedefinitions.json
