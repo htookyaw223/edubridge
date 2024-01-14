@@ -26,6 +26,6 @@ public class TestController {
 
     @GetMapping("/public/test")
     public ResponseEntity<String> testPost() {
-       return ResponseEntity.ok("POST request successful");
+       return ResponseEntity.ok("Health check request successful");
     }
 }
